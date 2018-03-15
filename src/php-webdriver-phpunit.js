@@ -205,9 +205,11 @@ options.header =
     + indents(1) + " */\n"
     + indents(1) + "public function setUp()\n"
     + indents(1) + "{\n"
+    + indents(2) + "$desiredCapabilities = WebDriver\\Remote\\DesiredCapabilities::chrome();\n"
+    + indents(2) + "$desiredCapabilities->setCapability('trustAllSSLCertificates', true);\n"
     + indents(2) + "$this->${receiver} = WebDriver\\Remote\\RemoteWebDriver::create(\n"
     + indents(3) + "$_SERVER['SELENIUM_HUB'],\n"
-    + indents(3) + "WebDriver\\Remote\\DesiredCapabilities::chrome()\n"
+    + indents(3) + "$desiredCapabilities\n"
     + indents(2) + ");\n"
     + indents(2) + "$this->baseUrl = $_SERVER['SELENIUM_BASE_URL'];\n"
     + indents(1) + "}\n"
@@ -239,7 +241,8 @@ options.footer =
     + indents(1) + "private function getSelect(WebDriver\\Remote\\RemoteWebElement $element): WebDriver\\WebDriverSelect\n"
     + indents(1) + "{\n"
     + indents(2) + "return new WebDriver\\WebDriverSelect($element);\n"
-    + indents(1) + "}\n";
+    + indents(1) + "}\n"
+    + "}\n";
 
 
 this.configForm =
