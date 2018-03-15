@@ -32,20 +32,6 @@ function array(value) {
     return str;
 }
 
-function string(value) {
-    if (value != null) {
-        //value = value.replace(/^\s+/, '');
-        //value = value.replace(/\s+$/, '');
-        value = value.replace(/\\/g, '\\\\');
-        value = value.replace(/\"/g, '\\"');
-        value = value.replace(/\r/g, '\\r');
-        value = value.replace(/\n/g, '\\n');
-        return "'" + value + "'";
-    } else {
-        return "''";
-    }
-}
-
 Equals.prototype.toString = function() {
     return this.e1.toString() + " == " + this.e2.toString();
 };
@@ -212,7 +198,7 @@ options.header =
     + indents(1) + "/**\n"
     + indents(1) + " * @var string\n"
     + indents(1) + " */\n"
-    + indents(1) + "private $baseUrl\n"
+    + indents(1) + "private $baseUrl;\n"
     + indents(0) + "\n"
     + indents(1) + "/**\n"
     + indents(1) + " * init webdriver\n"
