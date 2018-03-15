@@ -30,7 +30,21 @@ function array(value) {
     }
     str += ']';
     return str;
-};
+}
+
+function string(value) {
+    if (value != null) {
+        //value = value.replace(/^\s+/, '');
+        //value = value.replace(/\s+$/, '');
+        value = value.replace(/\\/g, '\\\\');
+        value = value.replace(/\"/g, '\\"');
+        value = value.replace(/\r/g, '\\r');
+        value = value.replace(/\n/g, '\\n');
+        return "'" + value + "'";
+    } else {
+        return "''";
+    }
+}
 
 Equals.prototype.toString = function() {
     return this.e1.toString() + " == " + this.e2.toString();
@@ -172,7 +186,7 @@ function defaultExtension() {
 
 
 this.options = {
-    receiver: '$this->webDriver',
+    receiver: 'webDriver',
     namespace: 'Test',
     extendedClass: 'TestCase',
     indent: '4',
@@ -191,13 +205,23 @@ options.header =
     + "class ${className} extends ${extendedClass}\n"
     + "{\n"
     + indents(1) + "/**\n"
+    + indents(1) + " * @var WebDriver\\Remote\\RemoteWebDriver\n"
+    + indents(1) + " */\n"
+    + indents(1) + "private $${receiver};\n"
+    + indents(0) + "\n"
+    + indents(1) + "/**\n"
+    + indents(1) + " * @var string\n"
+    + indents(1) + " */\n"
+    + indents(1) + "private $baseUrl\n"
+    + indents(0) + "\n"
+    + indents(1) + "/**\n"
     + indents(1) + " * init webdriver\n"
     + indents(1) + " */\n"
     + indents(1) + "public function setUp()\n"
     + indents(1) + "{\n"
-    + indents(2) + "${receiver} = WebDriver\\RemoteWebDriver::create(\n"
+    + indents(2) + "$this->${receiver} = WebDriver\\Remote\\RemoteWebDriver::create(\n"
     + indents(3) + "$_SERVER['SELENIUM_HUB'],\n"
-    + indents(3) + "WebDriver\\DesiredCapabilities::chrome();\n"
+    + indents(3) + "WebDriver\\Remote\\DesiredCapabilities::chrome()\n"
     + indents(2) + ");\n"
     + indents(2) + "$this->baseUrl = $_SERVER['SELENIUM_BASE_URL'];\n"
     + indents(1) + "}\n"
@@ -211,6 +235,7 @@ options.header =
 
 options.footer =
     indents(1) + "}\n"
+    + indents(0) + "\n"
     + indents(1) + "/**\n"
     + indents(1) + " * Close the current window.\n"
     + indents(1) + " */\n"
@@ -218,8 +243,17 @@ options.footer =
     + indents(1) + "{\n"
     + indents(2) + "$this->webDriver->close();\n"
     + indents(1) + "}\n"
-    + "\n"
-    + "}\n";
+    + indents(0) + "\n"
+    + indents(1) + "/**\n"
+    + indents(1) + " * @param WebDriver\\Remote\\RemoteWebElement $element\n"
+    + indents(1) + " *\n"
+    + indents(1) + " * @return WebDriver\\WebDriverSelect\n"
+    + indents(1) + " * @throws WebDriver\\Exception\\UnexpectedTagNameException\n"
+    + indents(1) + " */\n"
+    + indents(1) + "private function getSelect(WebDriver\\Remote\\RemoteWebElement $element): WebDriver\\WebDriverSelect\n"
+    + indents(1) + "{\n"
+    + indents(2) + "return new WebDriver\\WebDriverSelect($element);\n"
+    + indents(1) + "}\n";
 
 
 this.configForm =
@@ -326,19 +360,19 @@ WDAPI.Element.prototype.click = function() {
 };
 
 WDAPI.Element.prototype.getAttribute = function(attributeName) {
-    return this.ref + "->attribute(" + xlateArgument(attributeName) + ")";
+    return this.ref + "->getAttribute(" + xlateArgument(attributeName) + ")";
 };
 
 WDAPI.Element.prototype.getText = function() {
-    return this.ref + "->text()";
+    return this.ref + "->getText()";
 };
 
 WDAPI.Element.prototype.isDisplayed = function() {
-    return this.ref + "->displayed()";
+    return this.ref + "->isDisplayed()";
 };
 
 WDAPI.Element.prototype.isSelected = function() {
-    return this.ref + "->selected()";
+    return this.ref + "->isSelected()";
 };
 
 WDAPI.Element.prototype.sendKeys = function(text) {
@@ -350,7 +384,7 @@ WDAPI.Element.prototype.submit = function() {
 };
 
 WDAPI.Element.prototype.select = function(label) {
-    return "$this->select(" + this.ref + ")->selectOptionByLabel(" + xlateArgument(label) + ")";
+    return "$this->getSelect(" + this.ref + ")->selectByVisibleText(" + xlateArgument(label.string, label.type) + ")";
 };
 
 WDAPI.Element.prototype.setValue = function(value) {
@@ -385,7 +419,7 @@ WDAPI.Utils.isElementPresent = function(how, what) {
 SeleniumWebDriverAdaptor.prototype.isTextPresent = function() {
     let target = this.rawArgs[0];
     return '(bool)strpos(strip_tags($this->source()), ' + "'" + target + "'" + ')';
-}
+};
 
 SeleniumWebDriverAdaptor.prototype.type = function(elementLocator, text) {
     let locator = this._elementLocator(this.rawArgs[0]);
