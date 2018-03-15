@@ -1,0 +1,24 @@
+{
+    "manifest_version": 2,
+    "name": "PHPUnit formatter for Katalon Recorder",
+    "description": "This extension allows you to export your Katalon recordings into a PHPUnit testcase using facebook/php-webdriver",
+    "version": "1.0.2",
+    "background": {
+        "scripts": [
+            "src/selenium/formatCommandOnlyAdapter.js",
+            "src/selenium/webdriver.js",
+            "src/selenium/testCase.js",
+            "src/php-webdriver-phpunit.js",
+            "src/background.js"
+        ]
+    },
+    "permissions": [
+        "alarms"
+    ],
+    "icons": {
+        "16": "img/32.png",
+        "48": "img/96.png",
+        "128": "img/256.png"
+    },
+    "offline_enabled": true
+}
