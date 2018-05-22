@@ -8,7 +8,13 @@ function register() {
         {
             type: 'katalon_recorder_register',
             payload: {
-                summary: 'PHP (Webdriver + PHPUnit)'
+                capabilities: [
+                    {
+                        id: 'php-facebook-webdriver', // unique ID for each capability
+                        summary: 'PHP (Webdriver + PHPUnit)', // user-friendly name
+                        type: 'export' // for now only 'export' is available
+                    }
+                ]
             }
         }
     );
@@ -35,17 +41,31 @@ chrome.runtime.onMessageExternal.addListener(function(message, sender, sendRespo
         let name = message.payload.name;
         let commands = message.payload.commands;
         let testCase = new TestCase(name);
+        let payload = {
+            content: null,
+            extension: null,
+            mimetype: null
+        };
+
         testCase.commands = [];
         commands.forEach((command) => {
             testCase.commands.push(new Command(command.command, command.target, command.value))
         });
         testCase.formatLocal(name).header = "";
         testCase.formatLocal(name).footer = "";
-        sendResponse({
-            status: true,
-            payload: {
-                content: format(testCase, name)
-            }
-        });
+        switch (message.payload.capabilityId) {
+            case 'php-facebook-webdriver':
+                sendResponse({
+                    status: true,
+                    payload: {
+                        content: format(testCase, name),
+                        extension: 'php',
+                        mimetype: 'text/x-php'
+                    }
+                });
+
+                break;
+        }
+
     }
 });
