@@ -41,11 +41,6 @@ chrome.runtime.onMessageExternal.addListener(function(message, sender, sendRespo
         let name = message.payload.name;
         let commands = message.payload.commands;
         let testCase = new TestCase(name);
-        let payload = {
-            content: null,
-            extension: null,
-            mimetype: null
-        };
 
         testCase.commands = [];
         commands.forEach((command) => {
@@ -53,18 +48,15 @@ chrome.runtime.onMessageExternal.addListener(function(message, sender, sendRespo
         });
         testCase.formatLocal(name).header = "";
         testCase.formatLocal(name).footer = "";
-        switch (message.payload.capabilityId) {
-            case 'php-facebook-webdriver':
-                sendResponse({
-                    status: true,
-                    payload: {
-                        content: format(testCase, name),
-                        extension: 'php',
-                        mimetype: 'text/x-php'
-                    }
-                });
-
-                break;
+        if (message.payload.capabilityId === 'php-facebook-webdriver') {
+            sendResponse({
+                status: true,
+                payload: {
+                    content: format(testCase, name),
+                    extension: 'php',
+                    mimetype: 'text/x-php'
+                }
+            });
         }
 
     }
